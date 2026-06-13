@@ -39,6 +39,7 @@
     "moveDown": "Move down",
     "edit": "Edit",
     "delete": "Delete",
+    "reorder": "Drag to reorder",
     "confirmDeleteArtwork": "Delete “{{title}}” and its images?",
     "back": "Back",
     "newArtwork": "New artwork",

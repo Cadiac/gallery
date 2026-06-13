@@ -39,6 +39,7 @@
     "moveDown": "Siirrä alas",
     "edit": "Muokkaa",
     "delete": "Poista",
+    "reorder": "Raahaa järjestääksesi",
     "confirmDeleteArtwork": "Poistetaanko “{{title}}” ja sen kuvat?",
     "back": "Takaisin",
     "newArtwork": "Uusi teos",

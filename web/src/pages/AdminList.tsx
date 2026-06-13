@@ -1,7 +1,25 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ArrowDown, ArrowUp, CheckCircle2, ImageOff, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
+import { CheckCircle2, GripVertical, ImageOff, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import type { ArtworkListItem } from "shared";
 import { useAuth } from "../auth/AuthProvider";
 import { useArtworks, useDeleteArtwork, usePatchArtwork } from "../api/hooks";
 
@@ -14,22 +32,35 @@ export function AdminList() {
   const reorder = usePatchArtwork();
   const remove = useDeleteArtwork();
 
-  // Success feedback set by AdminEdit on save/create/delete. Clear the history
-  // state so a refresh doesn't show it again, and fade it out after a moment.
+  // Local ordering so a drag re-sorts instantly; resynced from the server data.
+  const [order, setOrder] = useState<ArtworkListItem[]>([]);
+  useEffect(() => {
+    if (artworks) setOrder(artworks);
+  }, [artworks]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = order.findIndex((a) => a.id === active.id);
+    const newIndex = order.findIndex((a) => a.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    setOrder((cur) => arrayMove(cur, oldIndex, newIndex));
+    reorder.mutate({ id: Number(active.id), patch: { position: newIndex } });
+  };
+
   const [notice, setNotice] = useState<string | null>(
     (location.state as { notice?: string } | null)?.notice ?? null,
   );
   useEffect(() => {
     if (!notice) return;
     window.history.replaceState({}, "");
-    const t = setTimeout(() => setNotice(null), 4000);
-    return () => clearTimeout(t);
+    const tmr = setTimeout(() => setNotice(null), 4000);
+    return () => clearTimeout(tmr);
   }, [notice]);
-
-  const move = (id: number, toIndex: number) => {
-    if (toIndex < 0 || !artworks || toIndex >= artworks.length) return;
-    reorder.mutate({ id, patch: { position: toIndex } });
-  };
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6">
@@ -64,70 +95,84 @@ export function AdminList() {
 
       {isLoading ? (
         <p className="py-12 text-center text-sm text-stone-400">{t("admin.loading")}</p>
-      ) : !artworks || artworks.length === 0 ? (
+      ) : order.length === 0 ? (
         <p className="py-12 text-center text-stone-400">{t("admin.emptyList")}</p>
       ) : (
-        <ul className="divide-y divide-black/5 overflow-hidden rounded-card bg-white shadow-sm ring-1 ring-black/5">
-          {artworks.map((art, idx) => (
-            <li key={art.id} className="flex items-center gap-3 p-3">
-              <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-stone-100">
-                {art.heroThumbUrl ? (
-                  <img src={art.heroThumbUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center text-stone-300">
-                    <ImageOff size={18} />
-                  </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="truncate font-medium text-stone-800">{art.title}</p>
-                <p className="truncate text-xs text-stone-400">
-                  {[art.year, art.tags.map((t) => t.name).join(", ")].filter(Boolean).join(" · ") ||
-                    "—"}
-                </p>
-              </div>
-              <div className="flex items-center gap-0.5">
-                <button
-                  type="button"
-                  title={t("admin.moveUp")}
-                  disabled={idx === 0}
-                  onClick={() => move(art.id, idx - 1)}
-                  className="rounded p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-700 disabled:opacity-30"
-                >
-                  <ArrowUp size={16} />
-                </button>
-                <button
-                  type="button"
-                  title={t("admin.moveDown")}
-                  disabled={idx === artworks.length - 1}
-                  onClick={() => move(art.id, idx + 1)}
-                  className="rounded p-1.5 text-stone-400 hover:bg-stone-100 hover:text-stone-700 disabled:opacity-30"
-                >
-                  <ArrowDown size={16} />
-                </button>
-                <Link
-                  to={`/admin/${art.slug}/edit`}
-                  title={t("admin.edit")}
-                  className="rounded p-1.5 text-stone-500 hover:bg-stone-100 hover:text-stone-800"
-                >
-                  <Pencil size={16} />
-                </Link>
-                <button
-                  type="button"
-                  title={t("admin.delete")}
-                  onClick={() => {
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+          <SortableContext items={order.map((a) => a.id)} strategy={verticalListSortingStrategy}>
+            <ul className="space-y-2">
+              {order.map((art) => (
+                <ArtworkRow
+                  key={art.id}
+                  art={art}
+                  onDelete={() => {
                     if (confirm(t("admin.confirmDeleteArtwork", { title: art.title })))
                       remove.mutate(art.id);
                   }}
-                  className="rounded p-1.5 text-red-500 hover:bg-red-50"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+                />
+              ))}
+            </ul>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
+  );
+}
+
+function ArtworkRow({ art, onDelete }: { art: ArtworkListItem; onDelete: () => void }) {
+  const { t } = useTranslation();
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: art.id,
+  });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-2 rounded-card bg-white p-3 ring-1 ring-black/5 ${
+        isDragging ? "relative z-10 shadow-lg" : "shadow-sm"
+      }`}
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        title={t("admin.reorder")}
+        className="shrink-0 cursor-grab touch-none rounded p-1 text-stone-300 hover:text-stone-500 active:cursor-grabbing"
+      >
+        <GripVertical size={18} />
+      </button>
+      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-stone-100">
+        {art.heroThumbUrl ? (
+          <img src={art.heroThumbUrl} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center text-stone-300">
+            <ImageOff size={18} />
+          </div>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium text-stone-800">{art.title}</p>
+        <p className="truncate text-xs text-stone-400">
+          {[art.year, art.tags.map((tag) => tag.name).join(", ")].filter(Boolean).join(" · ") || "—"}
+        </p>
+      </div>
+      <Link
+        to={`/admin/${art.slug}/edit`}
+        title={t("admin.edit")}
+        className="rounded p-1.5 text-stone-500 hover:bg-stone-100 hover:text-stone-800"
+      >
+        <Pencil size={16} />
+      </Link>
+      <button
+        type="button"
+        title={t("admin.delete")}
+        onClick={onDelete}
+        className="rounded p-1.5 text-red-500 hover:bg-red-50"
+      >
+        <Trash2 size={16} />
+      </button>
+    </li>
   );
 }
