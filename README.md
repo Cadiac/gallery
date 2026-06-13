@@ -65,8 +65,8 @@ built SPA, and `/media`), `pnpm test`, `pnpm typecheck`.
 ## Deployment
 
 The production instance runs the single Node process as a systemd service behind
-nginx (TLS via Let's Encrypt) on the same host as the pastels app, on port 3001.
-See [`deploy/`](deploy/README.md) for one-time setup; to redeploy after pushing to
+nginx (TLS via Let's Encrypt), bound to localhost on port 3001. See
+[`deploy/`](deploy/README.md) for one-time setup; to redeploy after pushing to
 `main` (on the server, as root):
 
 ```sh

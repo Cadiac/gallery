@@ -6,13 +6,13 @@ certbot) at **https://gallery.cadi.ac**. The SQLite DB and uploaded images live 
 account auto-create on boot. No Docker; the only native dependency is `sharp`,
 which installs a prebuilt binary on Debian x64 (no compiler needed).
 
-This shares a host with the pastels app — note the **different port (3001)** and
-service/user names.
+The app binds to `127.0.0.1:3001` (nginx is the only public listener), so it can
+share a host with other apps as long as that port is free.
 
 ## One-time setup (run as root on the server)
 
 ```sh
-# 1. Node 24 + pnpm (via corepack) — already present if pastels is installed
+# 1. Node 24 + pnpm (via corepack) — skip any that are already installed
 curl -fsSL https://deb.nodesource.com/setup_24.x | bash -
 apt-get install -y nodejs
 corepack enable
