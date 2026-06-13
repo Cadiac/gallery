@@ -46,6 +46,7 @@ export function ArtworkDetail() {
               <FadeImage
                 key={active.id}
                 src={active.displayUrl}
+                placeholderSrc={active.thumbUrl}
                 alt={art.title}
                 className="w-full"
                 imgClassName="w-full object-contain"
@@ -71,7 +72,7 @@ export function ArtworkDetail() {
                     idx === activeIdx ? "ring-stone-800" : "ring-transparent hover:ring-stone-300"
                   }`}
                 >
-                  <img src={img.thumbUrl} alt="" className="h-16 w-16 object-cover" />
+                  <FadeImage src={img.thumbUrl} alt="" className="h-16 w-16" imgClassName="h-16 w-16 object-cover" />
                 </button>
               ))}
             </div>
