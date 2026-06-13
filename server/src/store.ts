@@ -159,7 +159,7 @@ export function listTagsWithCounts(): TagWithCount[] {
     .prepare(
       `SELECT t.id, t.name, t.slug, COUNT(at.artwork_id) AS count
        FROM tags t JOIN artwork_tags at ON at.tag_id = t.id
-       GROUP BY t.id ORDER BY t.name`,
+       GROUP BY t.id ORDER BY count DESC, t.id`,
     )
     .all() as unknown as TagWithCount[];
 }
