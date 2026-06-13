@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { ImageOff } from "lucide-react";
 import type { ArtworkListItem } from "shared";
+import { FadeImage } from "./FadeImage";
 
 /** One artwork in the gallery grid: hero thumbnail, title, year and tags. */
 export function ArtworkCard({ art }: { art: ArtworkListItem }) {
@@ -11,12 +12,12 @@ export function ArtworkCard({ art }: { art: ArtworkListItem }) {
     <Link to={`/a/${art.slug}`} className="group block">
       <div className="overflow-hidden rounded-card bg-stone-100 shadow-sm ring-1 ring-black/5">
         {art.heroThumbUrl ? (
-          <img
+          <FadeImage
             src={art.heroThumbUrl}
             alt={art.title}
-            loading="lazy"
             style={{ aspectRatio: ratio }}
-            className="w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+            className="w-full"
+            imgClassName="w-full object-cover group-hover:scale-[1.03]"
           />
         ) : (
           <div

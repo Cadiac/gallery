@@ -4,6 +4,7 @@ import { ChevronLeft, Maximize2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useArtwork } from "../api/hooks";
 import { Lightbox } from "../components/Lightbox";
+import { FadeImage } from "../components/FadeImage";
 
 export function ArtworkDetail() {
   const { t } = useTranslation();
@@ -42,7 +43,13 @@ export function ArtworkDetail() {
               onClick={() => setLightboxOpen(true)}
               className="group relative overflow-hidden rounded-card bg-stone-100 ring-1 ring-black/5"
             >
-              <img src={active.displayUrl} alt={art.title} className="w-full object-contain" />
+              <FadeImage
+                key={active.id}
+                src={active.displayUrl}
+                alt={art.title}
+                className="w-full"
+                imgClassName="w-full object-contain"
+              />
               <span className="absolute right-2 top-2 rounded-full bg-black/40 p-1.5 text-white/90 opacity-0 transition group-hover:opacity-100">
                 <Maximize2 size={16} />
               </span>
