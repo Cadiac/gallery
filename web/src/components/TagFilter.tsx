@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { TagWithCount } from "shared";
 
 /** Horizontal row of tag chips that filters the gallery; `null` = show all. */
@@ -10,6 +11,7 @@ export function TagFilter({
   active: string | null;
   onSelect: (slug: string | null) => void;
 }) {
+  const { t } = useTranslation();
   if (tags.length === 0) return null;
 
   const chip = (selected: boolean) =>
@@ -22,7 +24,7 @@ export function TagFilter({
   return (
     <div className="flex flex-wrap gap-2">
       <button type="button" className={chip(active === null)} onClick={() => onSelect(null)}>
-        All
+        {t("gallery.allTag")}
       </button>
       {tags.map((t) => (
         <button

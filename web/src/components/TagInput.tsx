@@ -1,5 +1,6 @@
 import { useState, type KeyboardEvent } from "react";
 import { X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 /** Free-form tag editor: type a tag and press Enter/comma; existing tags are
  * offered as suggestions. Used in the admin artwork form. */
@@ -12,6 +13,7 @@ export function TagInput({
   onChange: (tags: string[]) => void;
   suggestions: string[];
 }) {
+  const { t } = useTranslation();
   const [input, setInput] = useState("");
 
   const has = (tag: string) => value.some((t) => t.toLowerCase() === tag.toLowerCase());
@@ -50,7 +52,7 @@ export function TagInput({
               type="button"
               onClick={() => removeAt(i)}
               className="rounded-full p-0.5 text-stone-400 hover:bg-stone-200 hover:text-stone-600"
-              aria-label={`Remove ${tag}`}
+              aria-label={t("admin.removeTag", { tag })}
             >
               <X size={13} />
             </button>
@@ -61,7 +63,7 @@ export function TagInput({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           onBlur={() => add(input)}
-          placeholder={value.length ? "" : "Add a technique…"}
+          placeholder={value.length ? "" : t("admin.addTechnique")}
           className="min-w-[8rem] flex-1 bg-transparent px-1 py-1 text-base outline-none"
         />
       </div>

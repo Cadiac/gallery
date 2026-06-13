@@ -1,0 +1,80 @@
+{
+  "site": {
+    "title": "Galleria",
+    "subtitle": ""
+  },
+  "nav": {
+    "manage": "Hallinta"
+  },
+  "gallery": {
+    "search": "Hae…",
+    "allTag": "Kaikki",
+    "loading": "Ladataan…",
+    "empty": "Ei vielä teoksia.",
+    "emptyFiltered": "Ei osumia."
+  },
+  "artwork": {
+    "back": "Galleria",
+    "loading": "Ladataan…",
+    "notFound": "Teosta ei löytynyt.",
+    "viewFullResolution": "Näytä alkuperäinen",
+    "noImage": "Ei kuvaa"
+  },
+  "login": {
+    "title": "Gallerian hallinta",
+    "subtitle": "Kirjaudu hallitsemaan teoksia.",
+    "username": "Käyttäjänimi",
+    "password": "Salasana",
+    "signIn": "Kirjaudu sisään",
+    "genericError": "Jotain meni vikaan."
+  },
+  "admin": {
+    "manage": "Hallinta",
+    "viewGallery": "Avaa galleria",
+    "new": "Uusi",
+    "signOut": "Kirjaudu ulos",
+    "loading": "Ladataan…",
+    "emptyList": "Ei vielä teoksia.",
+    "moveUp": "Siirrä ylös",
+    "moveDown": "Siirrä alas",
+    "edit": "Muokkaa",
+    "delete": "Poista",
+    "confirmDeleteArtwork": "Poistetaanko “{{title}}” ja sen kuvat?",
+    "back": "Takaisin",
+    "newArtwork": "Uusi teos",
+    "editArtwork": "Muokkaa teosta",
+    "titleLabel": "Nimi",
+    "descriptionLabel": "Kuvaus",
+    "yearLabel": "Vuosi",
+    "dimensionsLabel": "Mitat",
+    "dimensionsPlaceholder": "30×40 cm",
+    "tagsLabel": "Tekniikat",
+    "addTechnique": "Lisää tekniikka…",
+    "removeTag": "Poista {{tag}}",
+    "titleRequired": "Anna teokselle nimi.",
+    "saveError": "Tallennus epäonnistui.",
+    "saving": "Tallennetaan…",
+    "saveChanges": "Tallenna",
+    "createArtwork": "Luo",
+    "imagesHeading": "Kuvat",
+    "stagedHint": "Ladataan kun tallennat teoksen.",
+    "notFound": "Teosta ei löytynyt.",
+    "savedNotice": "“{{title}}” tallennettu.",
+    "createdNotice": "“{{title}}” luotu.",
+    "createdNoticeWithImages_one": "“{{title}}” luotu ja {{count}} kuva lisätty.",
+    "createdNoticeWithImages_other": "“{{title}}” luotu ja {{count}} kuvaa lisätty.",
+    "deletedNotice": "“{{title}}” poistettu.",
+    "uploading": "Ladataan…",
+    "dropzone": "Pudota kuvat tähän tai valitse napsauttamalla",
+    "dropzoneHint": "Alkuperäiset säilytetään ja pienennetään automaattisesti.",
+    "uploadFailed": "Lataus epäonnistui.",
+    "previewUnavailable": "Ei esikatselua",
+    "moveLeft": "Siirrä vasemmalle",
+    "setHero": "Aseta pääkuvaksi",
+    "moveRight": "Siirrä oikealle",
+    "deleteImage": "Poista kuva",
+    "confirmDeleteImage": "Poistetaanko tämä kuva?",
+    "hero": "Pääkuva",
+    "remove": "Poista"
+  }
+}

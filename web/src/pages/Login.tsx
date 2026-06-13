@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { CredentialsSchema } from "shared";
 import { useAuth } from "../auth/AuthProvider";
 import { ApiError } from "../api/client";
 
 export function Login() {
+  const { t } = useTranslation();
   const { user, loading, login } = useAuth();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -25,7 +27,7 @@ export function Login() {
     try {
       await login(parsed.data);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : "Something went wrong");
+      setError(err instanceof ApiError ? err.message : t("login.genericError"));
     } finally {
       setBusy(false);
     }
@@ -35,16 +37,16 @@ export function Login() {
     <div className="flex min-h-full items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <h1 className="mb-1 text-center font-display text-3xl font-bold text-stone-900">
-          Gallery admin
+          {t("login.title")}
         </h1>
-        <p className="mb-6 text-center text-sm text-stone-500">Sign in to manage artwork.</p>
+        <p className="mb-6 text-center text-sm text-stone-500">{t("login.subtitle")}</p>
 
         <form
           onSubmit={submit}
           className="flex flex-col gap-3 rounded-card bg-white p-5 shadow-md ring-1 ring-black/5"
         >
           <label className="flex flex-col gap-1 text-sm font-medium text-stone-700">
-            Username
+            {t("login.username")}
             <input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -54,7 +56,7 @@ export function Login() {
             />
           </label>
           <label className="flex flex-col gap-1 text-sm font-medium text-stone-700">
-            Password
+            {t("login.password")}
             <input
               type="password"
               value={password}
@@ -71,7 +73,7 @@ export function Login() {
             disabled={busy || loading}
             className="mt-1 rounded-card bg-stone-900 py-2.5 font-semibold text-stone-50 disabled:opacity-50 active:scale-[0.99]"
           >
-            {busy ? "…" : "Sign in"}
+            {busy ? "…" : t("login.signIn")}
           </button>
         </form>
       </div>

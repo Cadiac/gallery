@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ChevronLeft, Maximize2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useArtwork } from "../api/hooks";
 import { Lightbox } from "../components/Lightbox";
 
 export function ArtworkDetail() {
+  const { t } = useTranslation();
   const { slug = "" } = useParams();
   const { data: art, isLoading, isError } = useArtwork(slug);
   const [activeIdx, setActiveIdx] = useState(0);
@@ -17,9 +19,9 @@ export function ArtworkDetail() {
     setActiveIdx(hero >= 0 ? hero : 0);
   }, [art]);
 
-  if (isLoading) return <p className="p-12 text-center text-sm text-stone-400">Loading…</p>;
+  if (isLoading) return <p className="p-12 text-center text-sm text-stone-400">{t("artwork.loading")}</p>;
   if (isError || !art)
-    return <p className="p-12 text-center text-sm text-stone-500">Artwork not found.</p>;
+    return <p className="p-12 text-center text-sm text-stone-500">{t("artwork.notFound")}</p>;
 
   const active = art.images[activeIdx];
 
@@ -29,7 +31,7 @@ export function ArtworkDetail() {
         to="/"
         className="-ml-2 mb-5 inline-flex items-center gap-1 rounded-full px-2 py-1.5 text-sm font-medium text-stone-500 hover:text-stone-800"
       >
-        <ChevronLeft size={18} /> Gallery
+        <ChevronLeft size={18} /> {t("artwork.back")}
       </Link>
 
       <div className="grid gap-8 md:grid-cols-[1.6fr_1fr]">
@@ -47,7 +49,7 @@ export function ArtworkDetail() {
             </button>
           ) : (
             <div className="flex aspect-[4/3] items-center justify-center rounded-card bg-stone-100 text-stone-400">
-              No image
+              {t("artwork.noImage")}
             </div>
           )}
 
@@ -106,7 +108,7 @@ export function ArtworkDetail() {
               rel="noreferrer"
               className="mt-6 inline-block text-sm text-stone-500 underline underline-offset-2 hover:text-stone-800"
             >
-              View full resolution
+              {t("artwork.viewFullResolution")}
             </a>
           )}
         </div>

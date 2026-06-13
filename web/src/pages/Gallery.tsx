@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../auth/AuthProvider";
 import { useArtworks, useTags } from "../api/hooks";
 import { ArtworkCard } from "../components/ArtworkCard";
 import { TagFilter } from "../components/TagFilter";
 
 export function Gallery() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const tag = searchParams.get("tag");
@@ -24,16 +26,16 @@ export function Gallery() {
       <header className="mb-8 flex items-end justify-between gap-4">
         <div>
           <h1 className="font-display text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl">
-            Gallery
+            {t("site.title")}
           </h1>
-          <p className="mt-1 text-stone-500">A collection of original artwork.</p>
+          {t("site.subtitle") && <p className="mt-1 text-stone-500">{t("site.subtitle")}</p>}
         </div>
         {user && (
           <Link
             to="/admin"
             className="shrink-0 rounded-full bg-stone-900 px-4 py-2 text-sm font-medium text-white hover:bg-stone-700"
           >
-            Manage
+            {t("nav.manage")}
           </Link>
         )}
       </header>
@@ -48,17 +50,17 @@ export function Gallery() {
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search…"
+            placeholder={t("gallery.search")}
             className="w-full rounded-full border border-stone-300 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-stone-500"
           />
         </div>
       </div>
 
       {isLoading ? (
-        <p className="py-16 text-center text-sm text-stone-400">Loading…</p>
+        <p className="py-16 text-center text-sm text-stone-400">{t("gallery.loading")}</p>
       ) : !artworks || artworks.length === 0 ? (
         <p className="py-16 text-center text-stone-400">
-          {q || tag ? "No artwork matches your filter." : "No artwork yet."}
+          {q || tag ? t("gallery.emptyFiltered") : t("gallery.empty")}
         </p>
       ) : (
         <div className="animate-rise-in gap-5 [column-fill:_balance] columns-1 sm:columns-2 lg:columns-3">

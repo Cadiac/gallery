@@ -1,0 +1,80 @@
+{
+  "site": {
+    "title": "Gallery",
+    "subtitle": ""
+  },
+  "nav": {
+    "manage": "Manage"
+  },
+  "gallery": {
+    "search": "Search…",
+    "allTag": "All",
+    "loading": "Loading…",
+    "empty": "No artwork yet.",
+    "emptyFiltered": "No matches."
+  },
+  "artwork": {
+    "back": "Gallery",
+    "loading": "Loading…",
+    "notFound": "Artwork not found.",
+    "viewFullResolution": "View original",
+    "noImage": "No image"
+  },
+  "login": {
+    "title": "Gallery admin",
+    "subtitle": "Sign in to manage artwork.",
+    "username": "Username",
+    "password": "Password",
+    "signIn": "Sign in",
+    "genericError": "Something went wrong."
+  },
+  "admin": {
+    "manage": "Manage",
+    "viewGallery": "View gallery",
+    "new": "New",
+    "signOut": "Sign out",
+    "loading": "Loading…",
+    "emptyList": "No artwork yet.",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "edit": "Edit",
+    "delete": "Delete",
+    "confirmDeleteArtwork": "Delete “{{title}}” and its images?",
+    "back": "Back",
+    "newArtwork": "New artwork",
+    "editArtwork": "Edit artwork",
+    "titleLabel": "Title",
+    "descriptionLabel": "Description",
+    "yearLabel": "Year",
+    "dimensionsLabel": "Dimensions",
+    "dimensionsPlaceholder": "30×40 cm",
+    "tagsLabel": "Techniques",
+    "addTechnique": "Add a technique…",
+    "removeTag": "Remove {{tag}}",
+    "titleRequired": "Give the piece a title first.",
+    "saveError": "Could not save.",
+    "saving": "Saving…",
+    "saveChanges": "Save",
+    "createArtwork": "Create",
+    "imagesHeading": "Images",
+    "stagedHint": "Uploaded when you save.",
+    "notFound": "Artwork not found.",
+    "savedNotice": "Saved “{{title}}”.",
+    "createdNotice": "Created “{{title}}”.",
+    "createdNoticeWithImages_one": "Created “{{title}}” with {{count}} image.",
+    "createdNoticeWithImages_other": "Created “{{title}}” with {{count}} images.",
+    "deletedNotice": "Deleted “{{title}}”.",
+    "uploading": "Uploading…",
+    "dropzone": "Drop images here, or click to choose",
+    "dropzoneHint": "Originals are kept and resized automatically.",
+    "uploadFailed": "Upload failed.",
+    "previewUnavailable": "Preview unavailable",
+    "moveLeft": "Move left",
+    "setHero": "Set as hero",
+    "moveRight": "Move right",
+    "deleteImage": "Delete image",
+    "confirmDeleteImage": "Delete this image?",
+    "hero": "Hero",
+    "remove": "Remove"
+  }
+}

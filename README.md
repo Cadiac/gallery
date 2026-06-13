@@ -22,6 +22,16 @@ A live instance runs at **gallery.cadi.ac**.
   image and a grid thumbnail; EXIF orientation honoured). One image per piece is
   the "hero" that fronts the grid and leads the detail page.
 
+## Customising the copy
+
+User-facing text (the **gallery title and subtitle**, search/empty-state labels,
+the artwork detail and login screens) lives in `web/src/locales/*.json` and is
+rendered via `react-i18next`. The default language is **Finnish**
+([`fi.json`](web/src/locales/fi.json)); English ([`en.json`](web/src/locales/en.json))
+is the fallback. Edit the active language's file and rebuild to retitle the
+gallery or reword anything; change the default (or add a language) in
+[`web/src/i18n.ts`](web/src/i18n.ts). An empty `site.subtitle` is simply hidden.
+
 ## Stack
 
 pnpm workspace monorepo:

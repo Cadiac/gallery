@@ -103,6 +103,20 @@ export const api = {
     await request(`/api/artworks/${id}`, { method: "DELETE" });
   },
 
+  // Server-rendered thumbnail (webp) for a not-yet-saved file, so the admin can
+  // preview any format — including HEIC, which the browser may not decode.
+  async previewThumbnail(file: File): Promise<Blob> {
+    const form = new FormData();
+    form.append("file", file);
+    const res = await fetch("/api/images/preview", {
+      method: "POST",
+      credentials: "same-origin",
+      body: form,
+    });
+    if (!res.ok) throw new ApiError(res.status, "Preview failed");
+    return res.blob();
+  },
+
   async uploadImages(id: number, files: File[]): Promise<ArtworkDetail> {
     const form = new FormData();
     for (const file of files) form.append("files", file);

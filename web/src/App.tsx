@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "./auth/AuthProvider";
 import { Gallery } from "./pages/Gallery";
 import { ArtworkDetail } from "./pages/ArtworkDetail";
@@ -15,6 +16,11 @@ function RequireAuth({ children }: { children: ReactNode }) {
 }
 
 export function App() {
+  const { t } = useTranslation();
+  useEffect(() => {
+    document.title = t("site.title");
+  }, [t]);
+
   return (
     <Routes>
       <Route path="/" element={<Gallery />} />
