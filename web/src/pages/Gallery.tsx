@@ -40,18 +40,22 @@ export function Gallery() {
         )}
       </header>
 
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <TagFilter tags={tags ?? []} active={tag} onSelect={setTag} />
-        <div className="relative sm:w-64">
+      <div className="mb-8 flex items-center gap-3">
+        <div className="min-w-0 flex-1">
+          <TagFilter tags={tags ?? []} active={tag} onSelect={setTag} />
+        </div>
+        {/* Compact search, matched to the chip height; hidden on mobile where
+            the tag chips are enough to narrow things down. */}
+        <div className="relative hidden shrink-0 sm:block">
           <Search
-            size={16}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-stone-400"
+            size={14}
+            className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-stone-400"
           />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("gallery.search")}
-            className="w-full rounded-full border border-stone-300 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-stone-500"
+            className="w-44 rounded-full border border-stone-300 bg-white py-1 pl-8 pr-3 text-sm outline-none transition-[width,border-color] focus:w-56 focus:border-stone-500"
           />
         </div>
       </div>
