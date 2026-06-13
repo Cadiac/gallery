@@ -32,6 +32,9 @@ export function createApp() {
       rewriteRequestPath: (p) => p.replace(/^\/media\//, "/"),
     }),
   );
+  // A missing media file is a genuine 404 — don't let it fall through to the
+  // SPA fallback below (which would answer with index.html and a 200).
+  app.get("/media/*", (c) => c.json({ error: "Not found" }, 404));
 
   // In production, serve the built SPA with a history-API fallback.
   if (process.env.NODE_ENV === "production" && existsSync(WEB_DIST)) {
