@@ -1,11 +1,42 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import type { ArtworkListItem } from "shared";
 import { useAuth } from "../auth/AuthProvider";
 import { useArtworks, useTags } from "../api/hooks";
 import { ArtworkCard } from "../components/ArtworkCard";
 import { TagFilter } from "../components/TagFilter";
+
+// Column count tracks the Tailwind sm/lg breakpoints used below.
+function useColumnCount(): number {
+  const get = () =>
+    typeof window === "undefined"
+      ? 3
+      : window.innerWidth >= 1024
+        ? 3
+        : window.innerWidth >= 640
+          ? 2
+          : 1;
+  const [n, setN] = useState(get);
+  useEffect(() => {
+    const onResize = () => setN(get());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return n;
+}
+
+/**
+ * Deal items across `n` columns round-robin (0→col0, 1→col1, 2→col2, 3→col0…)
+ * so the visual order reads left-to-right, top-to-bottom — while each column
+ * stacks independently, keeping the staggered "gallery wall" look.
+ */
+function intoColumns(items: ArtworkListItem[], n: number): ArtworkListItem[][] {
+  const cols: ArtworkListItem[][] = Array.from({ length: n }, () => []);
+  items.forEach((item, i) => cols[i % n].push(item));
+  return cols;
+}
 
 export function Gallery() {
   const { t } = useTranslation();
@@ -20,6 +51,7 @@ export function Gallery() {
     q: q.trim() || undefined,
   });
   const { data: tags } = useTags();
+  const columns = useColumnCount();
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12">
@@ -67,9 +99,13 @@ export function Gallery() {
           {q || tag ? t("gallery.emptyFiltered") : t("gallery.empty")}
         </p>
       ) : (
-        <div className="animate-rise-in gap-5 [column-fill:_balance] columns-1 sm:columns-2 lg:columns-3">
-          {artworks.map((art) => (
-            <ArtworkCard key={art.id} art={art} />
+        <div className="flex animate-rise-in items-start gap-5">
+          {intoColumns(artworks, columns).map((col, i) => (
+            <div key={i} className="flex min-w-0 flex-1 flex-col gap-5">
+              {col.map((art) => (
+                <ArtworkCard key={art.id} art={art} />
+              ))}
+            </div>
           ))}
         </div>
       )}

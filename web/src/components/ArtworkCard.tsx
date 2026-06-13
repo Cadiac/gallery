@@ -8,7 +8,7 @@ export function ArtworkCard({ art }: { art: ArtworkListItem }) {
     art.heroWidth && art.heroHeight ? `${art.heroWidth} / ${art.heroHeight}` : "4 / 3";
 
   return (
-    <Link to={`/a/${art.slug}`} className="group mb-5 block break-inside-avoid">
+    <Link to={`/a/${art.slug}`} className="group block">
       <div className="overflow-hidden rounded-card bg-stone-100 shadow-sm ring-1 ring-black/5">
         {art.heroThumbUrl ? (
           <img
