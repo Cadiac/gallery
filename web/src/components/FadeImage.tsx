@@ -40,7 +40,10 @@ export function FadeImage({
         !loaded && !placeholderSrc ? "animate-pulse" : ""
       } ${className}`}
     >
-      {placeholderSrc && !loaded && (
+      {placeholderSrc && (
+        // Kept mounted as a backdrop (not swapped out on load): Safari can fire
+        // onLoad before the sharp image is painted, so removing this too early
+        // flashes a blank box. The loaded image just fades in on top of it.
         <img
           src={placeholderSrc}
           alt=""
