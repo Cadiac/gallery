@@ -61,3 +61,5 @@ Disallow: /
 # Everyone else (incl. Googlebot, Bingbot) may crawl the public gallery freely.
 User-agent: *
 Allow: /
+
+Sitemap: https://gallery.cadi.ac/sitemap.xml

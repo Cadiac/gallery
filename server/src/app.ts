@@ -1,5 +1,5 @@
-import { existsSync } from "node:fs";
-import { relative } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join, relative } from "node:path";
 import { serveStatic } from "@hono/node-server/serve-static";
 import { Hono } from "hono";
 import { sessionMiddleware } from "./middleware";
@@ -8,6 +8,8 @@ import { auth } from "./routes/auth";
 import { artworks } from "./routes/artworks";
 import { images } from "./routes/images";
 import { tags } from "./routes/tags";
+import { getArtworkBySlug } from "./store";
+import { artworkHtml, homeHtml, sitemap } from "./meta";
 import { UPLOADS_DIR, WEB_DIST } from "./paths";
 import type { AppEnv } from "./types";
 
@@ -39,9 +41,24 @@ export function createApp() {
   // SPA fallback below (which would answer with index.html and a 200).
   app.get("/media/*", (c) => c.json({ error: "Not found" }, 404));
 
+  // Dynamic sitemap of the home page + every visible artwork.
+  app.get("/sitemap.xml", (c) =>
+    c.body(sitemap(c), 200, { "Content-Type": "application/xml; charset=utf-8" }),
+  );
+
   // In production, serve the built SPA with a history-API fallback.
   if (process.env.NODE_ENV === "production" && existsSync(WEB_DIST)) {
     const webRoot = relative(process.cwd(), WEB_DIST) || ".";
+    // Social scrapers don't run JS, so inject per-page OG/Twitter tags + <title>
+    // into the HTML for the public routes. These must precede the static SPA
+    // serving below so they win over the raw index.html.
+    const indexHtml = readFileSync(join(WEB_DIST, "index.html"), "utf8");
+    app.get("/", (c) => c.html(homeHtml(indexHtml, c)));
+    app.get("/a/:slug", (c) => {
+      const art = getArtworkBySlug(c.req.param("slug"));
+      return c.html(art && !art.hidden ? artworkHtml(indexHtml, c, art) : homeHtml(indexHtml, c));
+    });
+
     app.use("/*", serveStatic({ root: webRoot }));
     app.get("*", serveStatic({ path: `${webRoot}/index.html` }));
   }

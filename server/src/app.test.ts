@@ -204,6 +204,17 @@ describe("gallery API", () => {
     await app.request(`/api/artworks/${created.id}`, { method: "DELETE", headers: { cookie } });
   });
 
+  it("serves an XML sitemap built from the request origin", async () => {
+    const res = await app.request("/sitemap.xml", {
+      headers: { host: "gallery.example", "x-forwarded-proto": "https" },
+    });
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toContain("xml");
+    const xml = await res.text();
+    expect(xml).toContain("<urlset");
+    expect(xml).toContain("<loc>https://gallery.example/</loc>");
+  });
+
   it("rejects bad login credentials and unknown artworks", async () => {
     const bad = await app.request("/api/auth/login", {
       method: "POST",
