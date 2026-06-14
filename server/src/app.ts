@@ -30,6 +30,9 @@ export function createApp() {
     serveStatic({
       root: uploadsRoot,
       rewriteRequestPath: (p) => p.replace(/^\/media\//, "/"),
+      // Filenames are content-random and never rewritten in place, so a media
+      // URL's bytes never change — cache them hard (a year, immutable).
+      onFound: (_path, c) => c.header("Cache-Control", "public, max-age=31536000, immutable"),
     }),
   );
   // A missing media file is a genuine 404 — don't let it fall through to the

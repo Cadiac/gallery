@@ -20,6 +20,16 @@ export function ArtworkDetail() {
     setActiveIdx(hero >= 0 ? hero : 0);
   }, [art]);
 
+  // Title the tab after the piece; restore the site title on leave.
+  useEffect(() => {
+    if (!art) return;
+    const site = t("site.title");
+    document.title = `${art.title} · ${site}`;
+    return () => {
+      document.title = site;
+    };
+  }, [art?.title, t]); // eslint-disable-line react-hooks/exhaustive-deps
+
   if (isLoading) return <p className="p-12 text-center text-sm text-stone-400">{t("artwork.loading")}</p>;
   if (isError || !art)
     return <p className="p-12 text-center text-sm text-stone-500">{t("artwork.notFound")}</p>;
@@ -132,7 +142,14 @@ export function ArtworkDetail() {
         </div>
       </div>
 
-      {lightboxOpen && <Lightbox image={active ?? null} onClose={() => setLightboxOpen(false)} />}
+      {lightboxOpen && (
+        <Lightbox
+          images={art.images}
+          index={activeIdx}
+          onIndexChange={setActiveIdx}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </div>
   );
 }
