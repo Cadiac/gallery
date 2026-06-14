@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ChevronLeft, Maximize2 } from "lucide-react";
+import { ChevronLeft, EyeOff, Maximize2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useArtwork } from "../api/hooks";
 import { Lightbox } from "../components/Lightbox";
@@ -85,6 +85,11 @@ export function ArtworkDetail() {
         </div>
 
         <div className="md:pt-2">
+          {art.hidden && (
+            <p className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-500">
+              <EyeOff size={13} /> {t("artwork.hidden")}
+            </p>
+          )}
           <h1 className="font-display text-3xl font-bold leading-tight text-stone-900">
             {art.title}
           </h1>

@@ -38,6 +38,7 @@ const DDL = `
     year        TEXT,
     dimensions  TEXT,
     position    INTEGER NOT NULL DEFAULT 0,
+    hidden      INTEGER NOT NULL DEFAULT 0,
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
   );
@@ -94,5 +95,13 @@ export function migrate(): void {
     ids.forEach((id, i) => upd.run(i, id));
   }
 
-  db.exec("PRAGMA user_version = 2");
+  // v3: artworks gained a `hidden` soft-delete flag.
+  const artworkCols = db.prepare("PRAGMA table_info(artworks)").all() as unknown as {
+    name: string;
+  }[];
+  if (!artworkCols.some((col) => col.name === "hidden")) {
+    db.exec("ALTER TABLE artworks ADD COLUMN hidden INTEGER NOT NULL DEFAULT 0");
+  }
+
+  db.exec("PRAGMA user_version = 3");
 }

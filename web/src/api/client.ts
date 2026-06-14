@@ -53,6 +53,7 @@ async function upload(path: string, form: FormData): Promise<unknown> {
 export interface ArtworkQuery {
   tag?: string;
   q?: string;
+  includeHidden?: boolean;
 }
 
 export const api = {
@@ -79,6 +80,7 @@ export const api = {
     const params = new URLSearchParams();
     if (query.tag) params.set("tag", query.tag);
     if (query.q) params.set("q", query.q);
+    if (query.includeHidden) params.set("includeHidden", "1");
     const qs = params.toString();
     return ArtworkListResponseSchema.parse(await request(`/api/artworks${qs ? `?${qs}` : ""}`));
   },

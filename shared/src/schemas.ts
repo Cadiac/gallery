@@ -74,6 +74,9 @@ export const ArtworkSchema = z.object({
   year: z.string().nullable(),
   dimensions: z.string().nullable(),
   position: z.number().int(),
+  // Hidden pieces are soft-deleted: gone from the public gallery and direct
+  // links, but still listed and editable in the admin panel.
+  hidden: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -135,6 +138,7 @@ export const ArtworkPatchSchema = z.object({
   dimensions: patchText(100),
   tags: TagListSchema.optional(),
   position: z.number().int().min(0).optional(),
+  hidden: z.boolean().optional(),
 });
 export type ArtworkPatch = z.infer<typeof ArtworkPatchSchema>;
 

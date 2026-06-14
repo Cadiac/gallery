@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { CheckCircle2, GripVertical, ImageOff, LogOut, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  GripVertical,
+  ImageOff,
+  LogOut,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import {
   DndContext,
@@ -34,8 +44,8 @@ export function AdminList() {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout } = useAuth();
-  const { data: artworks, isLoading } = useArtworks();
-  const reorder = usePatchArtwork();
+  const { data: artworks, isLoading } = useArtworks({ includeHidden: true });
+  const patch = usePatchArtwork();
   const remove = useDeleteArtwork();
 
   // Local ordering so a drag re-sorts instantly; resynced from the server data.
@@ -55,7 +65,7 @@ export function AdminList() {
     const newIndex = order.findIndex((a) => a.id === over.id);
     if (oldIndex < 0 || newIndex < 0) return;
     setOrder((cur) => arrayMove(cur, oldIndex, newIndex));
-    reorder.mutate({ id: Number(active.id), patch: { position: newIndex } });
+    patch.mutate({ id: Number(active.id), patch: { position: newIndex } });
   };
 
   const [notice, setNotice] = useState<string | null>(
@@ -111,6 +121,9 @@ export function AdminList() {
                 <ArtworkRow
                   key={art.id}
                   art={art}
+                  onToggleHidden={() =>
+                    patch.mutate({ id: art.id, patch: { hidden: !art.hidden } })
+                  }
                   onDelete={() => {
                     if (confirm(t("admin.confirmDeleteArtwork", { title: art.title })))
                       remove.mutate(art.id);
@@ -204,7 +217,15 @@ function TagRow({ tag }: { tag: TagWithCount }) {
   );
 }
 
-function ArtworkRow({ art, onDelete }: { art: ArtworkListItem; onDelete: () => void }) {
+function ArtworkRow({
+  art,
+  onToggleHidden,
+  onDelete,
+}: {
+  art: ArtworkListItem;
+  onToggleHidden: () => void;
+  onDelete: () => void;
+}) {
   const { t } = useTranslation();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: art.id,
@@ -228,7 +249,12 @@ function ArtworkRow({ art, onDelete }: { art: ArtworkListItem; onDelete: () => v
       >
         <GripVertical size={18} />
       </button>
-      <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md bg-stone-100">
+      {/* Hidden pieces are dimmed so they read as soft-deleted at a glance. */}
+      <div
+        className={`h-14 w-14 shrink-0 overflow-hidden rounded-md bg-stone-100 ${
+          art.hidden ? "opacity-40" : ""
+        }`}
+      >
         {art.heroThumbUrl ? (
           <img src={art.heroThumbUrl} alt="" className="h-full w-full object-cover" />
         ) : (
@@ -237,12 +263,27 @@ function ArtworkRow({ art, onDelete }: { art: ArtworkListItem; onDelete: () => v
           </div>
         )}
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-stone-800">{art.title}</p>
+      <div className={`min-w-0 flex-1 ${art.hidden ? "opacity-50" : ""}`}>
+        <p className="flex items-center gap-2 truncate font-medium text-stone-800">
+          <span className="truncate">{art.title}</span>
+          {art.hidden && (
+            <span className="shrink-0 rounded-full bg-stone-100 px-2 py-0.5 text-[11px] font-medium text-stone-500">
+              {t("admin.hidden")}
+            </span>
+          )}
+        </p>
         <p className="truncate text-xs text-stone-400">
           {[art.year, art.tags.map((tag) => tag.name).join(", ")].filter(Boolean).join(" · ") || "—"}
         </p>
       </div>
+      <button
+        type="button"
+        title={art.hidden ? t("admin.show") : t("admin.hide")}
+        onClick={onToggleHidden}
+        className="rounded p-1.5 text-stone-500 hover:bg-stone-100 hover:text-stone-800"
+      >
+        {art.hidden ? <EyeOff size={16} /> : <Eye size={16} />}
+      </button>
       <Link
         to={`/admin/${art.slug}/edit`}
         title={t("admin.edit")}

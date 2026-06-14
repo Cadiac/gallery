@@ -21,7 +21,8 @@
     "loading": "Loading…",
     "notFound": "Artwork not found.",
     "viewFullResolution": "View original",
-    "noImage": "No image"
+    "noImage": "No image",
+    "hidden": "Hidden — not shown in the gallery"
   },
   "login": {
     "title": "Gallery admin",
@@ -42,6 +43,9 @@
     "moveDown": "Move down",
     "edit": "Edit",
     "delete": "Delete",
+    "hide": "Hide from gallery",
+    "show": "Show in gallery",
+    "hidden": "Hidden",
     "reorder": "Drag to reorder",
     "techniqueOrder": "Technique order",
     "techniqueOrderHint": "Drag to set the order techniques appear in the gallery filter and the grouped view.",

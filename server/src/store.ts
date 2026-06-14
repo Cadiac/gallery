@@ -20,6 +20,7 @@ interface ArtworkRow {
   year: string | null;
   dimensions: string | null;
   position: number;
+  hidden: number;
   created_at: string;
   updated_at: string;
 }
@@ -53,6 +54,7 @@ function mapArtwork(r: ArtworkRow): Artwork {
     year: r.year,
     dimensions: r.dimensions,
     position: r.position,
+    hidden: !!r.hidden,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -98,9 +100,13 @@ function buildDetail(r: ArtworkRow): ArtworkDetail {
 
 // --- reads ------------------------------------------------------------------
 
-export function listArtworks(opts: { tag?: string; q?: string } = {}): ArtworkListItem[] {
+export function listArtworks(
+  opts: { tag?: string; q?: string; includeHidden?: boolean } = {},
+): ArtworkListItem[] {
   const where: string[] = [];
   const params: Record<string, string> = {};
+  // Public callers only ever see visible pieces; the admin opts into hidden ones.
+  if (!opts.includeHidden) where.push("a.hidden = 0");
   if (opts.tag) {
     where.push(
       `a.id IN (SELECT at.artwork_id FROM artwork_tags at
@@ -157,8 +163,12 @@ export function artworkExists(id: number): boolean {
 export function listTagsWithCounts(): TagWithCount[] {
   return db
     .prepare(
-      `SELECT t.id, t.name, t.slug, t.position, COUNT(at.artwork_id) AS count
-       FROM tags t JOIN artwork_tags at ON at.tag_id = t.id
+      // Count only visible artworks, so hidden pieces don't inflate the chips;
+      // a tag left with no visible artworks drops out (INNER JOIN).
+      `SELECT t.id, t.name, t.slug, t.position, COUNT(a.id) AS count
+       FROM tags t
+       JOIN artwork_tags at ON at.tag_id = t.id
+       JOIN artworks a ON a.id = at.artwork_id AND a.hidden = 0
        GROUP BY t.id ORDER BY t.position, t.id`,
     )
     .all() as unknown as TagWithCount[];
@@ -246,11 +256,12 @@ export function createArtwork(input: ArtworkInput): ArtworkDetail {
 
 export function patchArtwork(id: number, patch: ArtworkPatch): ArtworkDetail | null {
   const sets: string[] = [];
-  const vals: (string | null)[] = [];
+  const vals: (string | number | null)[] = [];
   if (patch.title !== undefined) (sets.push("title = ?"), vals.push(patch.title));
   if (patch.description !== undefined) (sets.push("description = ?"), vals.push(patch.description));
   if (patch.year !== undefined) (sets.push("year = ?"), vals.push(patch.year));
   if (patch.dimensions !== undefined) (sets.push("dimensions = ?"), vals.push(patch.dimensions));
+  if (patch.hidden !== undefined) (sets.push("hidden = ?"), vals.push(patch.hidden ? 1 : 0));
   if (sets.length) {
     sets.push("updated_at = datetime('now')");
     db.prepare(`UPDATE artworks SET ${sets.join(", ")} WHERE id = ?`).run(...vals, id);

@@ -22,12 +22,15 @@ export const artworks = new Hono<AppEnv>();
 artworks.get("/", (c) => {
   const tag = c.req.query("tag") || undefined;
   const q = (c.req.query("q") ?? "").trim() || undefined;
-  return c.json(listArtworks({ tag, q }));
+  // Hidden pieces are only included for the authenticated admin, on request.
+  const includeHidden = !!c.get("user") && c.req.query("includeHidden") === "1";
+  return c.json(listArtworks({ tag, q, includeHidden }));
 });
 
 artworks.get("/:slug", (c) => {
   const artwork = getArtworkBySlug(c.req.param("slug"));
-  if (!artwork) return c.json({ error: "Not found" }, 404);
+  // A hidden piece reads as a 404 to the public; the admin can still load it.
+  if (!artwork || (artwork.hidden && !c.get("user"))) return c.json({ error: "Not found" }, 404);
   return c.json(artwork);
 });
 

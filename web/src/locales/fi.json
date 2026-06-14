@@ -21,7 +21,8 @@
     "loading": "Ladataan…",
     "notFound": "Teosta ei löytynyt.",
     "viewFullResolution": "Näytä alkuperäinen",
-    "noImage": "Ei kuvaa"
+    "noImage": "Ei kuvaa",
+    "hidden": "Piilotettu – ei näy galleriassa"
   },
   "login": {
     "title": "Gallerian hallinta",
@@ -42,6 +43,9 @@
     "moveDown": "Siirrä alas",
     "edit": "Muokkaa",
     "delete": "Poista",
+    "hide": "Piilota galleriasta",
+    "show": "Näytä galleriassa",
+    "hidden": "Piilotettu",
     "reorder": "Raahaa järjestääksesi",
     "techniqueOrder": "Järjestys",
     "techniqueOrderHint": "Raahaa tekniikat haluamaasi järjestykseen.",

@@ -148,6 +148,62 @@ describe("gallery API", () => {
     expect((await (await app.request("/api/artworks")).json()) as ArtworkListItem[]).toEqual([]);
   });
 
+  it("hides pieces from the public but keeps them for the admin", async () => {
+    const cookie = cookieFrom(
+      await app.request("/api/auth/login", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ username: "curator", password: "let-me-in-123" }),
+      }),
+    );
+
+    const created = (await (
+      await app.request("/api/artworks", {
+        method: "POST",
+        headers: { "content-type": "application/json", cookie },
+        body: JSON.stringify({ title: "Secret Sketch", tags: ["WIP"] }),
+      })
+    ).json()) as ArtworkDetail;
+    expect(created.hidden).toBe(false);
+
+    // hide it
+    const patched = (await (
+      await app.request(`/api/artworks/${created.id}`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json", cookie },
+        body: JSON.stringify({ hidden: true }),
+      })
+    ).json()) as ArtworkDetail;
+    expect(patched.hidden).toBe(true);
+
+    // public: gone from the listing, 404 on the direct link, no leaked tag
+    expect((await (await app.request("/api/artworks")).json()) as ArtworkListItem[]).toEqual([]);
+    expect((await app.request(`/api/artworks/${created.slug}`)).status).toBe(404);
+    const publicTags = (await (await app.request("/api/tags")).json()) as TagWithCount[];
+    expect(publicTags.find((t) => t.slug === "wip")).toBeUndefined();
+
+    // admin: still listed (with includeHidden) and loadable by slug
+    const adminList = (await (
+      await app.request("/api/artworks?includeHidden=1", { headers: { cookie } })
+    ).json()) as ArtworkListItem[];
+    expect(adminList.map((a) => a.id)).toContain(created.id);
+    const adminDetail = await app.request(`/api/artworks/${created.slug}`, { headers: { cookie } });
+    expect(adminDetail.status).toBe(200);
+
+    // unhide → back in the public listing
+    await app.request(`/api/artworks/${created.id}`, {
+      method: "PATCH",
+      headers: { "content-type": "application/json", cookie },
+      body: JSON.stringify({ hidden: false }),
+    });
+    expect(
+      ((await (await app.request("/api/artworks")).json()) as ArtworkListItem[]).map((a) => a.id),
+    ).toContain(created.id);
+
+    // clean up so later assertions about an empty gallery elsewhere stay valid
+    await app.request(`/api/artworks/${created.id}`, { method: "DELETE", headers: { cookie } });
+  });
+
   it("rejects bad login credentials and unknown artworks", async () => {
     const bad = await app.request("/api/auth/login", {
       method: "POST",
