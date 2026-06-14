@@ -1,7 +1,7 @@
 {
   "site": {
     "title": "Galleria",
-    "subtitle": ""
+    "author": "Jaakko Husso"
   },
   "nav": {
     "manage": "Hallinta"

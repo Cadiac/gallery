@@ -98,7 +98,6 @@ export function Gallery() {
           <h1 className="font-display text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl">
             {t("site.title")}
           </h1>
-          {t("site.subtitle") && <p className="mt-1 text-stone-500">{t("site.subtitle")}</p>}
         </div>
         {user && (
           <Link

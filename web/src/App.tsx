@@ -42,6 +42,20 @@ function ScrollRestoration() {
   return null;
 }
 
+/** Quiet site-wide footer carrying the artist's name (from site.author). */
+function Footer() {
+  const { t } = useTranslation();
+  const name = t("site.author");
+  if (!name) return null;
+  return (
+    <footer className="mx-auto max-w-6xl px-4 pb-10 pt-4 sm:px-6">
+      <div className="border-t border-stone-200 pt-6 text-center text-sm text-stone-400">
+        {name} · {new Date().getFullYear()}
+      </div>
+    </footer>
+  );
+}
+
 function RequireAuth({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return <div className="p-12 text-center text-sm text-stone-400">Loading…</div>;
@@ -88,6 +102,7 @@ export function App() {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Footer />
     </Suspense>
   );
 }
