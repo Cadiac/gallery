@@ -49,7 +49,12 @@ export function ArtworkDetail() {
                 placeholderSrc={active.thumbUrl}
                 alt={art.title}
                 className="w-full"
-                imgClassName="w-full object-contain"
+                style={
+                  active.width && active.height
+                    ? { aspectRatio: `${active.width} / ${active.height}` }
+                    : undefined
+                }
+                imgClassName="h-full w-full object-contain"
               />
               <span className="absolute right-2 top-2 rounded-full bg-black/40 p-1.5 text-white/90 opacity-0 transition group-hover:opacity-100">
                 <Maximize2 size={16} />
