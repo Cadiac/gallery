@@ -1,11 +1,18 @@
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 import type { Context } from "hono";
 import type { ArtworkDetail } from "shared";
 import { getArtworkBySlug, listArtworks } from "./store";
 
-// Crawler-facing site identity. Kept here (not in the web locale files) because
-// this is the server-rendered HTML that social scrapers read without running JS.
-const SITE_NAME = "Gallery";
-const SITE_AUTHOR = "Jaakko Husso";
+// Crawler-facing site identity. Social scrapers read this server-rendered HTML
+// without running JS, so we reuse the web's default-locale (Finnish) strings —
+// one source of truth for the site name + author across the app.
+const locale = JSON.parse(
+  readFileSync(join(dirname(fileURLToPath(import.meta.url)), "../../web/src/locales/fi.json"), "utf8"),
+) as { site: { title: string; author: string } };
+const SITE_NAME = locale.site.title;
+const SITE_AUTHOR = locale.site.author;
 
 /** Absolute origin for building canonical/OG URLs. Prefers PUBLIC_URL; otherwise
  * trusts the proxy headers nginx sets (Host + X-Forwarded-Proto). */
@@ -75,7 +82,7 @@ export function homeHtml(html: string, c: Context): string {
   const hero = detail ? (detail.images.find((i) => i.isHero) ?? detail.images[0]) : undefined;
   return inject(html, {
     title: `${SITE_NAME} · ${SITE_AUTHOR}`,
-    description: `Artwork by ${SITE_AUTHOR}.`,
+    description: `${SITE_AUTHOR}n teoksia.`,
     url: `${base}/`,
     image: hero ? base + hero.displayUrl : undefined,
     type: "website",
