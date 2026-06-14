@@ -110,7 +110,7 @@ export function Gallery() {
         )}
       </header>
 
-      <div className="mb-8 flex items-center gap-3">
+      <div className="mb-8 flex items-start gap-2 sm:items-center sm:gap-3">
         <div className="min-w-0 flex-1">
           <TagFilter tags={tags ?? []} active={tag} onSelect={setTag} />
         </div>
@@ -135,10 +135,13 @@ export function Gallery() {
             type="button"
             onClick={toggleGrouped}
             title={grouped ? t("gallery.viewGrid") : t("gallery.viewByTechnique")}
-            className="flex shrink-0 items-center gap-1.5 rounded-full border border-stone-300 bg-white py-1 pl-2.5 pr-3 text-sm text-stone-600 transition hover:border-stone-500 hover:text-stone-900"
+            aria-label={grouped ? t("gallery.viewGrid") : t("gallery.viewByTechnique")}
+            className="flex h-7 shrink-0 items-center justify-center gap-1.5 rounded-full border border-stone-300 bg-white px-2 text-sm text-stone-600 transition hover:border-stone-500 hover:text-stone-900 sm:px-3"
           >
             {grouped ? <LayoutGrid size={15} /> : <Layers size={15} />}
-            <span>{grouped ? t("gallery.viewGrid") : t("gallery.viewByTechnique")}</span>
+            <span className="hidden sm:inline">
+              {grouped ? t("gallery.viewGrid") : t("gallery.viewByTechnique")}
+            </span>
           </button>
         )}
       </div>
