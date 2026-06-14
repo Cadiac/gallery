@@ -157,11 +157,23 @@ export function artworkExists(id: number): boolean {
 export function listTagsWithCounts(): TagWithCount[] {
   return db
     .prepare(
-      `SELECT t.id, t.name, t.slug, COUNT(at.artwork_id) AS count
+      `SELECT t.id, t.name, t.slug, t.position, COUNT(at.artwork_id) AS count
        FROM tags t JOIN artwork_tags at ON at.tag_id = t.id
-       GROUP BY t.id ORDER BY count DESC, t.id`,
+       GROUP BY t.id ORDER BY t.position, t.id`,
     )
     .all() as unknown as TagWithCount[];
+}
+
+export function tagExists(id: number): boolean {
+  return !!db.prepare("SELECT 1 FROM tags WHERE id = ?").get(id);
+}
+
+/** Move a tag to a new zero-based index in the manual technique order. */
+export function reorderTag(id: number, newIndex: number): void {
+  const ids = (
+    db.prepare("SELECT id FROM tags ORDER BY position, id").all() as unknown as { id: number }[]
+  ).map((r) => r.id);
+  resequence("tags", ids, id, newIndex);
 }
 
 // --- tags -------------------------------------------------------------------
@@ -172,7 +184,13 @@ function upsertTag(name: string): number {
     | undefined;
   if (existing) return existing.id;
   const slug = uniqueSlug(name, (s) => !!db.prepare("SELECT 1 FROM tags WHERE slug = ?").get(s));
-  const info = db.prepare("INSERT INTO tags (name, slug) VALUES (?, ?)").run(name, slug);
+  // New techniques append to the end of the manual order.
+  const { m: maxPos } = db
+    .prepare("SELECT COALESCE(MAX(position), -1) AS m FROM tags")
+    .get() as unknown as { m: number };
+  const info = db
+    .prepare("INSERT INTO tags (name, slug, position) VALUES (?, ?, ?)")
+    .run(name, slug, maxPos + 1);
   return Number(info.lastInsertRowid);
 }
 
@@ -340,7 +358,12 @@ export function deleteImage(id: number): ImageRow | null {
 }
 
 /** Splice `movedId` to `newIndex` within `ids` and rewrite positions 0..n-1. */
-function resequence(table: "artworks" | "images", ids: number[], movedId: number, newIndex: number): void {
+function resequence(
+  table: "artworks" | "images" | "tags",
+  ids: number[],
+  movedId: number,
+  newIndex: number,
+): void {
   const from = ids.indexOf(movedId);
   if (from === -1) return;
   ids.splice(from, 1);

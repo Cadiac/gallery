@@ -28,11 +28,21 @@ export const TagSchema = z.object({
 });
 export type Tag = z.infer<typeof TagSchema>;
 
-/** A tag with how many artworks carry it — drives the filter chips. */
+/**
+ * A tag with how many artworks carry it. `position` is the admin-set manual
+ * order; it drives the filter chips and the grouped gallery view.
+ */
 export const TagWithCountSchema = TagSchema.extend({
   count: z.number().int(),
+  position: z.number().int(),
 });
 export type TagWithCount = z.infer<typeof TagWithCountSchema>;
+
+/** PATCH /api/tags/:id body — move a technique to a new zero-based position. */
+export const TagPatchSchema = z.object({
+  position: z.number().int().min(0),
+});
+export type TagPatch = z.infer<typeof TagPatchSchema>;
 
 // --- Images -----------------------------------------------------------------
 

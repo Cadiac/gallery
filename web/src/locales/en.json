@@ -43,6 +43,8 @@
     "edit": "Edit",
     "delete": "Delete",
     "reorder": "Drag to reorder",
+    "techniqueOrder": "Technique order",
+    "techniqueOrderHint": "Drag to set the order techniques appear in the gallery filter and the grouped view.",
     "confirmDeleteArtwork": "Delete “{{title}}” and its images?",
     "back": "Back",
     "newArtwork": "New artwork",

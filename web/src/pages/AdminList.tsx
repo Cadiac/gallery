@@ -19,9 +19,15 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import type { ArtworkListItem } from "shared";
+import type { ArtworkListItem, TagWithCount } from "shared";
 import { useAuth } from "../auth/AuthProvider";
-import { useArtworks, useDeleteArtwork, usePatchArtwork } from "../api/hooks";
+import {
+  useArtworks,
+  useDeleteArtwork,
+  usePatchArtwork,
+  useReorderTag,
+  useTags,
+} from "../api/hooks";
 
 export function AdminList() {
   const { t } = useTranslation();
@@ -115,7 +121,86 @@ export function AdminList() {
           </SortableContext>
         </DndContext>
       )}
+
+      <TechniqueOrder />
     </div>
+  );
+}
+
+/** Drag-to-reorder list of techniques; the order drives the gallery filter
+ * chips and the grouped (by-technique) view. */
+function TechniqueOrder() {
+  const { t } = useTranslation();
+  const { data: tags } = useTags();
+  const reorder = useReorderTag();
+
+  const [order, setOrder] = useState<TagWithCount[]>([]);
+  useEffect(() => {
+    if (tags) setOrder(tags);
+  }, [tags]);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
+  if (!tags || tags.length < 2) return null;
+
+  const onDragEnd = ({ active, over }: DragEndEvent) => {
+    if (!over || active.id === over.id) return;
+    const oldIndex = order.findIndex((tg) => tg.id === active.id);
+    const newIndex = order.findIndex((tg) => tg.id === over.id);
+    if (oldIndex < 0 || newIndex < 0) return;
+    setOrder((cur) => arrayMove(cur, oldIndex, newIndex));
+    reorder.mutate({ id: Number(active.id), position: newIndex });
+  };
+
+  return (
+    <section className="mt-12">
+      <h2 className="font-display text-lg font-semibold text-stone-800">
+        {t("admin.techniqueOrder")}
+      </h2>
+      <p className="mb-3 mt-0.5 text-xs text-stone-400">{t("admin.techniqueOrderHint")}</p>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
+        <SortableContext items={order.map((tg) => tg.id)} strategy={verticalListSortingStrategy}>
+          <ul className="space-y-1.5">
+            {order.map((tg) => (
+              <TagRow key={tg.id} tag={tg} />
+            ))}
+          </ul>
+        </SortableContext>
+      </DndContext>
+    </section>
+  );
+}
+
+function TagRow({ tag }: { tag: TagWithCount }) {
+  const { t } = useTranslation();
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: tag.id,
+  });
+  const style = { transform: CSS.Transform.toString(transform), transition };
+
+  return (
+    <li
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-2 rounded-lg bg-white px-3 py-2 ring-1 ring-black/5 ${
+        isDragging ? "relative z-10 shadow-lg" : ""
+      }`}
+    >
+      <button
+        type="button"
+        {...attributes}
+        {...listeners}
+        title={t("admin.reorder")}
+        className="shrink-0 cursor-grab touch-none rounded p-1 text-stone-300 hover:text-stone-500 active:cursor-grabbing"
+      >
+        <GripVertical size={16} />
+      </button>
+      <span className="min-w-0 flex-1 truncate text-sm text-stone-700">{tag.name}</span>
+      <span className="text-xs text-stone-400">{tag.count}</span>
+    </li>
   );
 }
 

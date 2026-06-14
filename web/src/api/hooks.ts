@@ -21,6 +21,15 @@ export function useTags() {
   return useQuery({ queryKey: ["tags"], queryFn: api.tags });
 }
 
+export function useReorderTag() {
+  const invalidate = useInvalidateAll();
+  return useMutation({
+    mutationFn: ({ id, position }: { id: number; position: number }) =>
+      api.reorderTag(id, position),
+    onSuccess: invalidate,
+  });
+}
+
 /** Invalidate every query that an artwork/image/tag change can affect. */
 function useInvalidateAll() {
   const qc = useQueryClient();

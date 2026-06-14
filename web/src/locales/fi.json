@@ -43,6 +43,8 @@
     "edit": "Muokkaa",
     "delete": "Poista",
     "reorder": "Raahaa järjestääksesi",
+    "techniqueOrder": "Järjestys",
+    "techniqueOrderHint": "Raahaa tekniikat haluamaasi järjestykseen.",
     "confirmDeleteArtwork": "Poistetaanko “{{title}}” ja sen kuvat?",
     "back": "Takaisin",
     "newArtwork": "Uusi teos",

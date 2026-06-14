@@ -43,9 +43,10 @@ const DDL = `
   );
 
   CREATE TABLE IF NOT EXISTS tags (
-    id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL UNIQUE COLLATE NOCASE,
-    slug TEXT NOT NULL UNIQUE
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    name     TEXT NOT NULL UNIQUE COLLATE NOCASE,
+    slug     TEXT NOT NULL UNIQUE,
+    position INTEGER NOT NULL DEFAULT 0
   );
 
   CREATE TABLE IF NOT EXISTS artwork_tags (
@@ -73,5 +74,25 @@ const DDL = `
 /** Create the schema. Safe to run repeatedly (idempotent). */
 export function migrate(): void {
   db.exec(DDL);
-  db.exec("PRAGMA user_version = 1");
+
+  // v2: tags gained a manual `position`. Databases created before this lack the
+  // column (CREATE TABLE IF NOT EXISTS won't add it), so backfill it here, in
+  // the old count-descending order, to preserve the existing visual ordering.
+  const tagCols = db.prepare("PRAGMA table_info(tags)").all() as unknown as { name: string }[];
+  if (!tagCols.some((col) => col.name === "position")) {
+    db.exec("ALTER TABLE tags ADD COLUMN position INTEGER NOT NULL DEFAULT 0");
+    const ids = (
+      db
+        .prepare(
+          `SELECT t.id FROM tags t
+           LEFT JOIN artwork_tags at ON at.tag_id = t.id
+           GROUP BY t.id ORDER BY COUNT(at.artwork_id) DESC, t.id`,
+        )
+        .all() as unknown as { id: number }[]
+    ).map((r) => r.id);
+    const upd = db.prepare("UPDATE tags SET position = ? WHERE id = ?");
+    ids.forEach((id, i) => upd.run(i, id));
+  }
+
+  db.exec("PRAGMA user_version = 2");
 }

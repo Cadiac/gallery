@@ -136,4 +136,12 @@ export const api = {
   async tags(): Promise<TagWithCount[]> {
     return z.array(TagWithCountSchema).parse(await request("/api/tags"));
   },
+
+  async reorderTag(id: number, position: number): Promise<TagWithCount[]> {
+    return z
+      .array(TagWithCountSchema)
+      .parse(
+        await request(`/api/tags/${id}`, { method: "PATCH", body: JSON.stringify({ position }) }),
+      );
+  },
 };
