@@ -109,7 +109,7 @@ export function Gallery() {
         )}
       </header>
 
-      <div className="mb-8 flex items-start gap-2 sm:items-center sm:gap-3">
+      <div className="mb-8 flex items-start gap-2 sm:gap-3">
         <div className="min-w-0 flex-1">
           <TagFilter tags={tags ?? []} active={tag} onSelect={setTag} />
         </div>
