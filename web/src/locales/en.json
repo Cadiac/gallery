@@ -11,7 +11,10 @@
     "allTag": "All",
     "loading": "Loading…",
     "empty": "No artwork yet.",
-    "emptyFiltered": "No matches."
+    "emptyFiltered": "No matches.",
+    "viewByTechnique": "By technique",
+    "viewGrid": "Grid",
+    "untagged": "Other"
   },
   "artwork": {
     "back": "Gallery",

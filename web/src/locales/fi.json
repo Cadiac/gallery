@@ -11,7 +11,10 @@
     "allTag": "Kaikki",
     "loading": "Ladataan…",
     "empty": "Ei vielä teoksia.",
-    "emptyFiltered": "Ei osumia."
+    "emptyFiltered": "Ei osumia.",
+    "viewByTechnique": "Tekniikoittain",
+    "viewGrid": "Ruudukko",
+    "untagged": "Muut"
   },
   "artwork": {
     "back": "Galleria",
