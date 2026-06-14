@@ -67,6 +67,29 @@ from `/etc/gallery.env`. To change the password later, edit that file and
 bash /opt/gallery/deploy/update.sh   # as root: pull, install, build, restart
 ```
 
+## Blocking AI crawlers
+
+`web/public/robots.txt` asks the major LLM/dataset crawlers (GPTBot, ClaudeBot,
+Google-Extended, PerplexityBot, CCBot, …) not to crawl the site. That's advisory
+— polite bots obey it, but it doesn't *stop* anyone. For hard enforcement, nginx
+returns `403` to those user-agents via a shared snippet
+(`deploy/block-ai-bots.conf`), included from each site's serving block:
+
+```sh
+# Install the snippet once for the whole server…
+cp deploy/block-ai-bots.conf /etc/nginx/snippets/
+
+# …then add this line inside the :443 server block of each vhost:
+#   include snippets/block-ai-bots.conf;
+
+nginx -t && systemctl reload nginx
+```
+
+On this server it's already included from all three sites (gallery, pastels,
+lumispheres). Update the list of blocked bots in one place — the snippet — and
+reload. Note: certbot manages the live vhosts, so the `include` lines were added
+to the deployed `/etc/nginx/sites-available/*` files directly, not via this repo.
+
 ## Handy
 
 ```sh

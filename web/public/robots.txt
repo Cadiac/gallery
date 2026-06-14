@@ -1,0 +1,63 @@
+# Block known AI / LLM crawlers and dataset scrapers from the whole site.
+# robots.txt is advisory — well-behaved crawlers honour it; see deploy/README
+# for nginx user-agent blocking if you want it enforced.
+
+# --- OpenAI ---
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+Disallow: /
+
+# --- Anthropic ---
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+Disallow: /
+
+# --- Google (AI training; does NOT affect Google Search indexing) ---
+User-agent: Google-Extended
+Disallow: /
+
+# --- Apple Intelligence ---
+User-agent: Applebot-Extended
+Disallow: /
+
+# --- Perplexity ---
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+Disallow: /
+
+# --- Meta AI ---
+User-agent: Meta-ExternalAgent
+User-agent: meta-externalagent
+User-agent: FacebookBot
+Disallow: /
+
+# --- ByteDance (TikTok) ---
+User-agent: Bytespider
+Disallow: /
+
+# --- Amazon ---
+User-agent: Amazonbot
+Disallow: /
+
+# --- Common Crawl (widely used as a training corpus) ---
+User-agent: CCBot
+Disallow: /
+
+# --- Others ---
+User-agent: cohere-ai
+User-agent: Diffbot
+User-agent: Omgilibot
+User-agent: Omgili
+User-agent: ImagesiftBot
+User-agent: YouBot
+User-agent: AI2Bot
+User-agent: Timpibot
+Disallow: /
+
+# Everyone else (incl. Googlebot, Bingbot) may crawl the public gallery freely.
+User-agent: *
+Allow: /
