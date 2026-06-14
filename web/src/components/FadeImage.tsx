@@ -58,7 +58,7 @@ export function FadeImage({
         loading="lazy"
         decoding="async"
         onLoad={() => setLoaded(true)}
-        className={`transition duration-700 ease-out ${loaded ? "opacity-100" : "opacity-0"} ${imgClassName}`}
+        className={`relative z-10 transition duration-700 ease-out ${loaded ? "opacity-100" : "opacity-0"} ${imgClassName}`}
       />
     </div>
   );
