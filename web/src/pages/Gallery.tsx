@@ -124,7 +124,7 @@ export function Gallery() {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder={t("gallery.search")}
-            className="w-44 rounded-full border border-stone-300 bg-white py-1 pl-8 pr-3 text-sm outline-none transition-[width,border-color] focus:w-56 focus:border-stone-500"
+            className="h-7 w-44 rounded-full border border-stone-300 bg-white pl-8 pr-3 text-sm outline-none transition-[width,border-color] focus:w-56 focus:border-stone-500"
           />
         </div>
         {/* Switch between the single grid and one masonry block per technique.
