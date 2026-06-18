@@ -15,7 +15,8 @@ import { useTranslation } from "react-i18next";
 import {
   DndContext,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCenter,
   useSensor,
   useSensors,
@@ -54,8 +55,11 @@ export function AdminList() {
     if (artworks) setOrder(artworks);
   }, [artworks]);
 
+  // MouseSensor for desktop (small drag threshold); TouchSensor for mobile/iPad,
+  // where a short press-and-hold starts the drag so a normal swipe still scrolls.
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
@@ -152,8 +156,11 @@ function TechniqueOrder() {
     if (tags) setOrder(tags);
   }, [tags]);
 
+  // MouseSensor for desktop (small drag threshold); TouchSensor for mobile/iPad,
+  // where a short press-and-hold starts the drag so a normal swipe still scrolls.
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(MouseSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 6 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
