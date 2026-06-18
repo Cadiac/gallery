@@ -28,7 +28,7 @@ function useColumnCount(): number {
 }
 
 // Vertical gap between cards, in px (matches the horizontal column gap).
-const GAP = 20;
+const GAP = 16;
 
 /**
  * Masonry grid that lets a piece span multiple columns (`art.size`, clamped to
