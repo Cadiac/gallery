@@ -21,6 +21,7 @@ interface ArtworkRow {
   dimensions: string | null;
   position: number;
   hidden: number;
+  size: number;
   created_at: string;
   updated_at: string;
 }
@@ -55,6 +56,7 @@ function mapArtwork(r: ArtworkRow): Artwork {
     dimensions: r.dimensions,
     position: r.position,
     hidden: !!r.hidden,
+    size: r.size,
     createdAt: r.created_at,
     updatedAt: r.updated_at,
   };
@@ -245,10 +247,10 @@ export function createArtwork(input: ArtworkInput): ArtworkDetail {
     .get() as unknown as { m: number };
   const info = db
     .prepare(
-      `INSERT INTO artworks (slug, title, description, year, dimensions, position)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO artworks (slug, title, description, year, dimensions, size, position)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
     )
-    .run(slug, input.title, input.description, input.year, input.dimensions, maxPos + 1);
+    .run(slug, input.title, input.description, input.year, input.dimensions, input.size, maxPos + 1);
   const id = Number(info.lastInsertRowid);
   setArtworkTags(id, input.tags);
   return getArtworkById(id)!;
@@ -262,6 +264,7 @@ export function patchArtwork(id: number, patch: ArtworkPatch): ArtworkDetail | n
   if (patch.year !== undefined) (sets.push("year = ?"), vals.push(patch.year));
   if (patch.dimensions !== undefined) (sets.push("dimensions = ?"), vals.push(patch.dimensions));
   if (patch.hidden !== undefined) (sets.push("hidden = ?"), vals.push(patch.hidden ? 1 : 0));
+  if (patch.size !== undefined) (sets.push("size = ?"), vals.push(patch.size));
   if (sets.length) {
     sets.push("updated_at = datetime('now')");
     db.prepare(`UPDATE artworks SET ${sets.join(", ")} WHERE id = ?`).run(...vals, id);

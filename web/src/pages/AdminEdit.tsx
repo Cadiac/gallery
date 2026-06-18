@@ -32,6 +32,7 @@ export function AdminEdit() {
   const [year, setYear] = useState("");
   const [dimensions, setDimensions] = useState("");
   const [tags, setTags] = useState<string[]>([]);
+  const [size, setSize] = useState(1);
   // Images chosen before a new piece exists; uploaded right after it's created.
   const [staged, setStaged] = useState<File[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +45,7 @@ export function AdminEdit() {
     setYear(art.year ?? "");
     setDimensions(art.dimensions ?? "");
     setTags(art.tags.map((t) => t.name));
+    setSize(art.size);
   }, [art?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const busy = create.isPending || patch.isPending || upload.isPending;
@@ -56,6 +58,7 @@ export function AdminEdit() {
       year: year.trim() || null,
       dimensions: dimensions.trim() || null,
       tags,
+      size,
     };
     if (!fields.title) {
       setError(t("admin.titleRequired"));
@@ -137,6 +140,26 @@ export function AdminEdit() {
         <div className={label}>
           {t("admin.tagsLabel")}
           <TagInput value={tags} onChange={setTags} suggestions={(allTags ?? []).map((tag) => tag.name)} />
+        </div>
+        <div className={label}>
+          {t("admin.sizeLabel")}
+          <div className="flex gap-2">
+            {([1, 2, 3] as const).map((s) => (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setSize(s)}
+                className={`flex-1 rounded-card border px-3 py-2 text-sm transition ${
+                  size === s
+                    ? "border-stone-900 bg-stone-900 text-white"
+                    : "border-stone-300 bg-white text-stone-600 hover:border-stone-500"
+                }`}
+              >
+                {t(s === 1 ? "admin.sizeNormal" : s === 2 ? "admin.sizeLarge" : "admin.sizeFull")}
+              </button>
+            ))}
+          </div>
+          <p className="text-xs font-normal text-stone-400">{t("admin.sizeHint")}</p>
         </div>
       </div>
 

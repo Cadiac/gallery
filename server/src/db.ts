@@ -39,6 +39,7 @@ const DDL = `
     dimensions  TEXT,
     position    INTEGER NOT NULL DEFAULT 0,
     hidden      INTEGER NOT NULL DEFAULT 0,
+    size        INTEGER NOT NULL DEFAULT 1,
     created_at  TEXT NOT NULL DEFAULT (datetime('now')),
     updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
   );
@@ -103,5 +104,10 @@ export function migrate(): void {
     db.exec("ALTER TABLE artworks ADD COLUMN hidden INTEGER NOT NULL DEFAULT 0");
   }
 
-  db.exec("PRAGMA user_version = 3");
+  // v4: artworks gained a `size` (grid column span) for emphasising pieces.
+  if (!artworkCols.some((col) => col.name === "size")) {
+    db.exec("ALTER TABLE artworks ADD COLUMN size INTEGER NOT NULL DEFAULT 1");
+  }
+
+  db.exec("PRAGMA user_version = 4");
 }

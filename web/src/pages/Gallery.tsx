@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { LayoutGrid, Layers, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -27,28 +27,53 @@ function useColumnCount(): number {
   return n;
 }
 
-/**
- * Deal items across `n` columns round-robin (0→col0, 1→col1, 2→col2, 3→col0…)
- * so the visual order reads left-to-right, top-to-bottom — while each column
- * stacks independently, keeping the staggered "gallery wall" look.
- */
-function intoColumns(items: ArtworkListItem[], n: number): ArtworkListItem[][] {
-  const cols: ArtworkListItem[][] = Array.from({ length: n }, () => []);
-  items.forEach((item, i) => cols[i % n].push(item));
-  return cols;
-}
+// Vertical gap between cards, in px (matches the horizontal column gap).
+const GAP = 20;
 
-/** The staggered masonry grid, reused by the full view and each technique group. */
+/**
+ * Masonry grid that lets a piece span multiple columns (`art.size`, clamped to
+ * the column count). A 1px row track + per-item measured row spans lets cards of
+ * any aspect ratio tile with no vertical gaps, and `grid-auto-flow: dense` packs
+ * the wide pieces in without leaving holes — the "gallery wall" look, with
+ * emphasis. Reused by the full view and each technique group.
+ */
 function MasonryGrid({ items, columns }: { items: ArtworkListItem[]; columns: number }) {
   return (
-    <div className="flex items-start gap-5">
-      {intoColumns(items, columns).map((col, i) => (
-        <div key={i} className="flex min-w-0 flex-1 flex-col gap-5">
-          {col.map((art) => (
-            <ArtworkCard key={art.id} art={art} />
-          ))}
-        </div>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+        columnGap: GAP,
+        gridAutoRows: "1px",
+        gridAutoFlow: "dense",
+      }}
+    >
+      {items.map((art) => (
+        <MasonryItem key={art.id} span={Math.min(art.size, columns)}>
+          <ArtworkCard art={art} />
+        </MasonryItem>
       ))}
+    </div>
+  );
+}
+
+/** Wraps a card, measuring its height to occupy the right number of 1px rows
+ * (plus the gap), so the dense grid above tiles seamlessly. */
+function MasonryItem({ span, children }: { span: number; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [rows, setRows] = useState(1);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const measure = () => setRows(Math.max(1, Math.ceil(el.getBoundingClientRect().height + GAP)));
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return (
+    <div style={{ gridColumn: `span ${span}`, gridRowEnd: `span ${rows}` }}>
+      <div ref={ref}>{children}</div>
     </div>
   );
 }

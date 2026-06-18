@@ -74,6 +74,10 @@ export const ArtworkSchema = z.object({
   year: z.string().nullable(),
   dimensions: z.string().nullable(),
   position: z.number().int(),
+  // How many grid columns the piece spans (1 = normal). Lets the artist
+  // emphasise a piece by drawing it larger on the gallery wall; clamped to the
+  // current column count when rendered.
+  size: z.number().int(),
   // Hidden pieces are soft-deleted: gone from the public gallery and direct
   // links, but still listed and editable in the admin panel.
   hidden: z.boolean(),
@@ -127,6 +131,7 @@ export const ArtworkInputSchema = z.object({
   year: createText(20),
   dimensions: createText(100),
   tags: TagListSchema.default([]),
+  size: z.number().int().min(1).max(3).default(1),
 });
 export type ArtworkInput = z.infer<typeof ArtworkInputSchema>;
 
@@ -139,6 +144,7 @@ export const ArtworkPatchSchema = z.object({
   tags: TagListSchema.optional(),
   position: z.number().int().min(0).optional(),
   hidden: z.boolean().optional(),
+  size: z.number().int().min(1).max(3).optional(),
 });
 export type ArtworkPatch = z.infer<typeof ArtworkPatchSchema>;
 
