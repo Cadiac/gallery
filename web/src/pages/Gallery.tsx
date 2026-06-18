@@ -58,12 +58,13 @@ export function Gallery() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const tag = searchParams.get("tag");
-  // Grouped view and a single-tag filter are mutually exclusive: picking a tag
-  // drops back to the filtered grid, and grouping clears any tag filter.
-  const grouped = searchParams.get("view") === "groups";
+  // The grouped (by-technique) view is the default at "/"; "?view=list" is the
+  // flat alternative, and picking a single tag drops to a filtered flat grid.
+  const grouped = searchParams.get("view") !== "list" && !tag;
   const setTag = (slug: string | null) =>
     setSearchParams(slug ? { tag: slug } : {}, { replace: true });
-  const toggleGrouped = () => setSearchParams(grouped ? {} : { view: "groups" }, { replace: true });
+  const toggleGrouped = () =>
+    setSearchParams(grouped ? { view: "list" } : {}, { replace: true });
   const [q, setQ] = useState("");
   const { data: artworks, isLoading } = useArtworks({
     tag: grouped ? undefined : tag ?? undefined,
