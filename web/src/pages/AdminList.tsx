@@ -52,7 +52,16 @@ export function AdminList() {
   // Local ordering so a drag re-sorts instantly; resynced from the server data.
   const [order, setOrder] = useState<ArtworkListItem[]>([]);
   useEffect(() => {
-    if (artworks) setOrder(artworks);
+    if (!artworks) return;
+    // Adopt server data, but keep the current array (same reference) when nothing
+    // meaningful changed. The refetch triggered by our own reorder returns a new
+    // array; replacing `order` with it mid-render would yank the list out from
+    // under dnd-kit's drop animation and can leave the moved row unresponsive.
+    setOrder((cur) => {
+      const sig = (l: ArtworkListItem[]) =>
+        l.map((a) => `${a.id}:${a.hidden ? 1 : 0}:${a.title}:${a.heroThumbUrl ?? ""}`).join("|");
+      return sig(cur) === sig(artworks) ? cur : artworks;
+    });
   }, [artworks]);
 
   // MouseSensor for desktop (small drag threshold); TouchSensor for mobile/iPad,
@@ -153,7 +162,13 @@ function TechniqueOrder() {
 
   const [order, setOrder] = useState<TagWithCount[]>([]);
   useEffect(() => {
-    if (tags) setOrder(tags);
+    if (!tags) return;
+    // Keep the same array when nothing changed, so confirming our own reorder
+    // doesn't replace the list mid drop-animation (see AdminList for details).
+    setOrder((cur) => {
+      const sig = (l: TagWithCount[]) => l.map((tg) => `${tg.id}:${tg.name}:${tg.count}`).join("|");
+      return sig(cur) === sig(tags) ? cur : tags;
+    });
   }, [tags]);
 
   // MouseSensor for desktop (small drag threshold); TouchSensor for mobile/iPad,
