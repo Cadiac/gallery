@@ -82,7 +82,7 @@ export function homeHtml(html: string, c: Context): string {
   const hero = detail ? (detail.images.find((i) => i.isHero) ?? detail.images[0]) : undefined;
   return inject(html, {
     title: `${SITE_NAME} · ${SITE_AUTHOR}`,
-    description: `${SITE_AUTHOR}n teoksia.`,
+    description: "Taidehommia",
     url: `${base}/`,
     image: hero ? base + hero.displayUrl : undefined,
     type: "website",
